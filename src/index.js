@@ -1,10 +1,27 @@
-let express = require('express')
+let express = require('express');
 
-let app = express()
+let app = express();
+let personRoute = require('./routes/person')
+let path = require('path')
 
-let personRoute = require('.routes/person')
+app.use((req, res, next) => {
+  console.log(`${new Date().toString()} => ${req.originalUrl}`);
+
+  next()
+})
 app.use(personRoute)
-app.use(express.static('public'))
+app.use(express.static('public'));
 
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => console.info(`Server has started on ${PORT}`))
+// Handler for 404 - Resource Not Found
+app.use((req, res, next) => {
+  res.status(404).send('We think you are lost!')
+})
+
+// Handler for 500 - Resource Not Found
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.sendFile(path.join(__dirname, '../public/500.html'))
+})
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.info(`Server has started on port ${PORT}`));
